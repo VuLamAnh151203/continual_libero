@@ -10,7 +10,7 @@ def load_model_for_eval(model_id: str, checkpoint_path: str = None):
     
     try:
         # Assuming LeRobot policy loading API
-        from lerobot.common.policies.factory import make_policy
+        from lerobot.policies.factory import make_policy
         
         # Load the base policy
         policy = make_policy(repo_id=model_id)
