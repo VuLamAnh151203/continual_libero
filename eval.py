@@ -4,29 +4,33 @@ import torch
 
 def load_model_for_eval(model_id: str, checkpoint_path: str = None):
     """
-    Loads the HuggingFace model and injects LoRA adapters if checkpoint is provided.
+    Loads a pretrained LeRobot policy for evaluation.
+    If checkpoint_path is provided, loads PEFT/LoRA weights on top.
     """
     print(f"[eval] Loading model '{model_id}'...")
-    
-    # try:
-    from lerobot.configs.policies import PreTrainedConfig
-    from lerobot.policies.factory import make_policy
-    
-    # 1. Load the generic configuration
+
+    from lerobot.configs import PreTrainedConfig
+    from lerobot.policies import get_policy_class
+
+    # 1) Load the pretrained config first
     cfg = PreTrainedConfig.from_pretrained(model_id)
-    
-    # 2. Find out the specific policy class (e.g. XVlaPolicy, DiffusionPolicy)
-    dummy_policy = make_policy(cfg)
-    policy_class = dummy_policy.__class__
-    
-    # 3. Load the pretrained weights using the specific class
-    policy = policy_class.from_pretrained(model_id)
-    
+
+    # 2) Get the correct policy class from the config type
+    policy_class = get_policy_class(cfg.type)
+
+    # 3) Load pretrained weights directly (no make_policy call)
+    policy = policy_class.from_pretrained(
+        pretrained_name_or_path=model_id,
+        config=cfg,
+        local_files_only=False,  # set True if you only want local files
+    )
+
+    # 4) Optionally attach LoRA/PEFT adapter
     if checkpoint_path:
         print(f"[eval] Injecting LoRA weights from '{checkpoint_path}'...")
         from peft import PeftModel
         policy = PeftModel.from_pretrained(policy, checkpoint_path)
-        
+
     policy.eval()
     return policy
     # except Exception as e:
