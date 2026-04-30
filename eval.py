@@ -13,7 +13,7 @@ def load_model_for_eval(model_id: str, checkpoint_path: str = None):
         from lerobot.policies.factory import make_policy
         
         # Load the base policy
-        policy = make_policy(repo_id=model_id)
+        policy = make_policy(pretrained_policy_name_or_path=model_id)
         
         if checkpoint_path:
             print(f"[eval] Injecting LoRA weights from '{checkpoint_path}'...")
