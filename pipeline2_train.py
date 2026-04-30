@@ -3,10 +3,10 @@ import json
 import numpy as np
 from dotenv import load_dotenv
 
-from continual_libero.data_utils import TASK_SEQUENCE, get_dataset_path
-from continual_libero.train import fine_tune_lora
-from continual_libero.pipeline1_eval import evaluate_sequential
-from continual_libero.metrics import summarize_metrics
+from data_utils import TASK_SEQUENCE, get_dataset_path
+from train import fine_tune_lora
+from pipeline1_eval import evaluate_sequential
+from metrics import summarize_metrics
 
 load_dotenv()
 

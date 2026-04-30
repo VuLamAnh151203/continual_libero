@@ -1,6 +1,6 @@
 import os
-from continual_libero.pipeline1_eval import evaluate_sequential
-from continual_libero.data_utils import TASK_SEQUENCE
+from pipeline1_eval import evaluate_sequential
+from data_utils import TASK_SEQUENCE
 from dotenv import load_dotenv
 
 load_dotenv()

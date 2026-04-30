@@ -1,5 +1,5 @@
 import os
-from continual_libero.sim_env import evaluate_policy_in_sim
+from sim_env import evaluate_policy_in_sim
 import torch
 
 def load_model_for_eval(model_id: str, checkpoint_path: str = None):
