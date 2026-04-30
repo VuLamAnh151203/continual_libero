@@ -1,6 +1,6 @@
 import os
-from continual_libero.data_utils import get_dataset_path
-from continual_libero.eval import load_model_for_eval, run_evaluation
+from data_utils import get_dataset_path
+from eval import load_model_for_eval, run_evaluation
 
 def evaluate_sequential(model_id: str, task_sequence: list, checkpoint_path: str = None, num_episodes: int = 10) -> dict:
     """
