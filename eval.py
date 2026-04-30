@@ -10,17 +10,30 @@ def load_model_for_eval(model_id: str, checkpoint_path: str = None):
     
     try:
         from lerobot.configs.policies import PreTrainedConfig
-        from lerobot.policies.factory import make_policy
         
-        # 1. Load the generic configuration
+        # 1. Load the generic configuration to find the policy type
         cfg = PreTrainedConfig.from_pretrained(model_id)
+        policy_type = getattr(cfg, "type", getattr(cfg, "model_type", None))
         
-        # 2. Find out the specific policy class (e.g. XVlaPolicy, DiffusionPolicy)
-        dummy_policy = make_policy(cfg)
-        policy_class = dummy_policy.__class__
-        
-        # 3. Load the pretrained weights using the specific class
-        policy = policy_class.from_pretrained(model_id)
+        # 2. Map the type to the actual LeRobot class to avoid `make_policy`'s strict ds_meta check
+        if policy_type == "xvla":
+            try:
+                from lerobot.policies.xvla.modeling_xvla import XVLAPolicy as PolicyClass
+            except ImportError:
+                from lerobot.policies.xvla.modeling_xvla import XVlaPolicy as PolicyClass
+        elif policy_type == "act":
+            from lerobot.policies.act.modeling_act import ACTPolicy as PolicyClass
+        elif policy_type == "diffusion":
+            from lerobot.policies.diffusion.modeling_diffusion import DiffusionPolicy as PolicyClass
+        elif policy_type == "pi0_fast":
+            from lerobot.policies.pi0_fast.modeling_pi0_fast import PI0FastPolicy as PolicyClass
+        elif policy_type == "pi0":
+            from lerobot.policies.pi0.modeling_pi0 import PI0Policy as PolicyClass
+        else:
+            raise ValueError(f"Unsupported policy type: {policy_type}")
+            
+        # 3. Load the pretrained weights
+        policy = PolicyClass.from_pretrained(model_id)
         
         if checkpoint_path:
             print(f"[eval] Injecting LoRA weights from '{checkpoint_path}'...")
