@@ -9,11 +9,18 @@ def load_model_for_eval(model_id: str, checkpoint_path: str = None):
     print(f"[eval] Loading model '{model_id}'...")
     
     try:
-        # Attempt to use the generic PreTrainedPolicy loader
-        from lerobot.policies.pretrained import PreTrainedPolicy
+        from lerobot.configs.policies import PreTrainedConfig
+        from lerobot.policies.factory import make_policy
         
-        # Load the base policy
-        policy = PreTrainedPolicy.from_pretrained(model_id)
+        # 1. Load the generic configuration
+        cfg = PreTrainedConfig.from_pretrained(model_id)
+        
+        # 2. Find out the specific policy class (e.g. XVlaPolicy, DiffusionPolicy)
+        dummy_policy = make_policy(cfg)
+        policy_class = dummy_policy.__class__
+        
+        # 3. Load the pretrained weights using the specific class
+        policy = policy_class.from_pretrained(model_id)
         
         if checkpoint_path:
             print(f"[eval] Injecting LoRA weights from '{checkpoint_path}'...")
